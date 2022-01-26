@@ -1,4 +1,4 @@
-function GetVisualSelection()
+function! GetVisualSelection()
     " Why is this not a built-in Vim script function?!
     let [line_start, column_start] = getpos("'<")[1:2]
     let [line_end, column_end] = getpos("'>")[1:2]
@@ -11,37 +11,32 @@ function GetVisualSelection()
     return join(lines, "\n")
 endfunction
 
-function VicalProcessVisualSelect()
+" Escape special characters in a string for exact matching.
+" This is useful to copying strings from the file to the search tool
+" Based on this - http://peterodding.com/code/vim/profile/autoload/xolox/escape.vim
+function! EscapeString (string)
+  let string=a:string
+  " Escape regex characters
+  let string = escape(string, '^$.*\/~[]')
+  " Escape the line endings
+  let string = substitute(string, '\n', '\\n', 'g')
+  return string
+endfunction
+
+function! ViscalCalc()
     let selected = GetVisualSelection()
-    let res = system('echo "' . selected . '" | bc -l')
-    return trim(res)
-
+    let result = trim(system('echo "' . selected . '" | bc -l'))
+    " A bit of magic, also this is evidence that VimL is very primitive.
     "
+    " '%s                              -> perform a search and replace
+    "   /\%V'                          -> limit search to only selected section
+    "       .                          -> concat
+    "           EscapeString(selected) -> search for selected text
+    "       . '/' .                    -> concat
+    "           result                 -> replace selected text with command output
+    "           .  '/'                 -> conclude text search
+    execute '%s/\%V' . EscapeString(selected) . '/' . result . '/'
 endfunction
 
-function VicalResult()
-    let result = VicalProcessVisualSelect()
 
-    " 1. This escsape visual mode and print result into a new line 
-    " execute "normal! i" . result . "\<Esc>"
-
-    " 2. The complicated way:
-    "   - save cursor position, 
-    "   - go to norm
-    "   - move cursor to saved position
-    "   - print result 
-    let save_pos = getpos(".")
-    echo save_pos
-    call setpos('.', save_pos)
-    execute "normal! i \<Esc>"
-    " execute "normal! i" . result . "\<Esc>"
-    
-    " 3. NOTE: maybe yank the result into the default register might be more
-    "convenient here
-    " execute "i " . res . "normal!"
-endfunction
-
-xmap <silent> u :call VicalResult()<CR>
-
-let selected = '( 2.43*1.643 )'
-
+xmap <silent> t :call ViscalCalc()<CR>
