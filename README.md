@@ -3,11 +3,12 @@
 
 ## Options
 
+Set hotkey in a visual mode for calling Vimath function
 
 ```
-" set hotkey for function
-" define your own calculator process
+xmap <silent> t :call VimathCalc()<CR>
 ```
+
 
 ## Features 
 
@@ -18,7 +19,7 @@ an external calculator command
 
 under your cursor.
 
-### 2. Single-variable function
+### 2. TODO Single-variable function
 
 Define a single-variable function f(x) stored in register. Use Visual Mode to
 assign value to x, press u to calculate f(x).
