@@ -1,5 +1,11 @@
 
-# Vical
+# Vimath
+
+Quick calculator in Vim. Visual select your formula, call the calulator, result
+will be printed under right cursor.
+
+
+TODO(vim screen demo)
 
 ## Options
 
